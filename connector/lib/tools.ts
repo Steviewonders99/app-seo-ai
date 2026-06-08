@@ -1,8 +1,10 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-// Imported from the existing repo service. Plain JS, ESM. allowJs covers it.
+// Vendored copy of src/services/keywordPlannerService.js because Vercel only
+// uploads files inside the project root. Sync via scripts/sync-service.sh
+// when the upstream service changes.
 // @ts-ignore — JS file with no declarations
-import keywordPlannerService from '../../src/services/keywordPlannerService.js';
+import keywordPlannerService from './keywordPlannerService.js';
 import { log } from './logger';
 
 /**
