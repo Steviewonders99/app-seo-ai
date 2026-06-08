@@ -1,0 +1,4 @@
+node_modules/
+.vercel/
+public/seo-ai-keywords.dxt
+*.log
