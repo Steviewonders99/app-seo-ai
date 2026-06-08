@@ -1,0 +1,39 @@
+{
+  "dxt_version": "0.1",
+  "name": "seo-ai-keywords",
+  "display_name": "SEO AI — Keyword Research",
+  "version": "0.1.0",
+  "description": "Google Ads Keyword Planner research for article topics. Connects to a shared hosted server using a team access token.",
+  "author": {
+    "name": "Steven Junop"
+  },
+  "license": "ISC",
+  "icon": "icon.png",
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"],
+      "env": {
+        "CONNECTOR_SHARED_TOKEN": "${user_config.shared_token}",
+        "CONNECTOR_REMOTE_URL": "https://connector-theta-ten.vercel.app/api/mcp"
+      }
+    }
+  },
+  "user_config": {
+    "shared_token": {
+      "type": "string",
+      "title": "Shared access token",
+      "description": "Paste the team access token Steven sent you. This is the only thing you need to configure.",
+      "sensitive": true,
+      "required": true
+    }
+  },
+  "tools": [
+    { "name": "research_keywords" },
+    { "name": "get_keyword_metrics" },
+    { "name": "get_historical_metrics" },
+    { "name": "health_check" }
+  ]
+}
