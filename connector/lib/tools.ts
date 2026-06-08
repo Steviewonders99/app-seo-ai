@@ -3,7 +3,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 // Imported from the existing repo service. Plain JS, ESM. allowJs covers it.
 // @ts-ignore — JS file with no declarations
 import keywordPlannerService from '../../src/services/keywordPlannerService.js';
-import { log } from './logger.js';
+import { log } from './logger';
 
 /**
  * Tool input schemas. Exported so the .dxt proxy can mirror them.
