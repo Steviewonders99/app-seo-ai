@@ -35,12 +35,15 @@ function unauthorized(): Response {
 function constantTimeEqual(a: string, b: string): boolean {
   const aBuf = Buffer.from(a, 'utf8');
   const bBuf = Buffer.from(b, 'utf8');
-  if (aBuf.length !== bBuf.length) {
-    // Still compare to keep timing stable.
-    const padded = Buffer.alloc(aBuf.length, 0);
-    bBuf.copy(padded, 0, 0, Math.min(aBuf.length, bBuf.length));
-    timingSafeEqual(aBuf, padded);
-    return false;
-  }
-  return timingSafeEqual(aBuf, bBuf);
+  // Always pad both buffers to the same length and run timingSafeEqual,
+  // regardless of input lengths. The length-mismatch check is folded into
+  // the final boolean so the timing cost is identical for length-correct
+  // and length-wrong tokens.
+  const len = Math.max(aBuf.length, bBuf.length, 1);
+  const aPadded = Buffer.alloc(len, 0);
+  const bPadded = Buffer.alloc(len, 0);
+  aBuf.copy(aPadded);
+  bBuf.copy(bPadded);
+  const bytesMatch = timingSafeEqual(aPadded, bPadded);
+  return bytesMatch && aBuf.length === bBuf.length;
 }

@@ -5,7 +5,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 // when the upstream service changes.
 // @ts-ignore — JS file with no declarations
 import keywordPlannerService from './keywordPlannerService.js';
-import { log } from './logger';
+import { log, sanitize } from './logger';
 
 /**
  * Tool input schemas. Exported so the .dxt proxy can mirror them.
@@ -56,7 +56,7 @@ export function registerTools(server: McpServer): void {
           ],
         };
       } catch (error) {
-        const err = error instanceof Error ? error.message : String(error);
+        const err = sanitize(error instanceof Error ? error.message : String(error));
         log('error', 'tool.err', { tool: 'research_keywords', keyword, latencyMs: Date.now() - t0, err });
         return { content: [{ type: 'text', text: `Error: ${err}` }], isError: true };
       }
@@ -78,7 +78,7 @@ export function registerTools(server: McpServer): void {
           ],
         };
       } catch (error) {
-        const err = error instanceof Error ? error.message : String(error);
+        const err = sanitize(error instanceof Error ? error.message : String(error));
         log('error', 'tool.err', { tool: 'get_keyword_metrics', keywordCount: keywords.length, latencyMs: Date.now() - t0, err });
         return { content: [{ type: 'text', text: `Error: ${err}` }], isError: true };
       }
@@ -98,7 +98,7 @@ export function registerTools(server: McpServer): void {
           content: [{ type: 'text', text: JSON.stringify({ keywords, forecastMetrics: results }, null, 2) }],
         };
       } catch (error) {
-        const err = error instanceof Error ? error.message : String(error);
+        const err = sanitize(error instanceof Error ? error.message : String(error));
         log('error', 'tool.err', { tool: 'get_historical_metrics', keywordCount: keywords.length, latencyMs: Date.now() - t0, err });
         return { content: [{ type: 'text', text: `Error: ${err}` }], isError: true };
       }

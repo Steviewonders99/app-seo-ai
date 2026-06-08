@@ -20,3 +20,16 @@ export function log(level: Level, msg: string, fields: LogFields = {}): void {
   if (level === 'error') console.error(line);
   else console.log(line);
 }
+
+/**
+ * Redact anything that looks like a secret out of free-text strings before
+ * we log them or return them to a tool caller. Conservative: matches long
+ * hex/base64-ish runs that fit the shape of bearer tokens, developer tokens,
+ * and OAuth refresh tokens. Over-matching is acceptable; silently leaking
+ * a token is not.
+ */
+const SECRET_PATTERN = /\b[A-Za-z0-9_\-]{20,}\b/g;
+
+export function sanitize(text: string): string {
+  return text.replace(SECRET_PATTERN, '[redacted]');
+}
