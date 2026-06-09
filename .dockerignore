@@ -11,3 +11,19 @@ README.md
 .idea
 *.log
 logs
+
+# ── Trim image size: directories the SEO API doesn't need at runtime ──
+docs
+beautechweb
+buttupmediawebcopy
+thewharffishcoweb
+agent
+connector
+connector-dxt
+scripts
+docker-compose.yml
+Dockerfile
+smithery.*
+mcp.json
+keyword_data.json
+.vercel

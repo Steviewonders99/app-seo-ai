@@ -8,6 +8,7 @@ import swaggerUi from 'swagger-ui-express';
 import keywordRoutes from './routes/keywordRoutes.js';
 import serpRoutes from './routes/serpRoutes.js';
 import competitorRoutes from './routes/competitorRoutes.js';
+import { bearerAuth } from './middleware/auth.js';
 
 // Load environment variables
 dotenv.config();
@@ -20,6 +21,9 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Bearer-token gate — no-op unless SEO_AI_API_KEY is set (prod / ACA).
+app.use(bearerAuth);
 
 // Swagger configuration
 const swaggerOptions = {
@@ -53,10 +57,15 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Server is running' });
 });
 
+// Bind to 0.0.0.0 in containers so ACA's ingress can reach the process.
+const HOST = process.env.HOST ?? '0.0.0.0';
+
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`API Documentation available at http://localhost:${PORT}/api-docs`);
+app.listen(PORT, HOST, () => {
+  const authMode = process.env.SEO_AI_API_KEY ? 'bearer-auth' : 'open (dev)';
+  console.log(`Server running on ${HOST}:${PORT}  [${authMode}]`);
+  console.log(`API docs:  http://${HOST}:${PORT}/api-docs`);
+  console.log(`Health:    http://${HOST}:${PORT}/health`);
 });
 
 export default app;
