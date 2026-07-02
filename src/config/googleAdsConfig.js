@@ -1,6 +1,12 @@
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load .env from project root (two levels up from config/)
+dotenv.config({ path: join(__dirname, '..', '..', '.env') });
 
 // Google Ads API configuration
 const googleAdsConfig = {

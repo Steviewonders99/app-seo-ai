@@ -14,7 +14,7 @@ export const generateKeywordIdeas = async (req, res) => {
     }
 
     // Parse locations if provided
-    const parsedLocations = locations ? JSON.parse(locations) : [2250]; // Default to US
+    const parsedLocations = locations ? JSON.parse(locations) : [2840]; // Default to US
     const parsedLimit = limit ? parseInt(limit) : 50;
     
     const keywordIdeas = await keywordPlannerService.generateKeywordIdeas(
@@ -55,7 +55,7 @@ export const getKeywordMetrics = async (req, res) => {
     }
 
     // Parse locations if provided
-    const parsedLocations = locations || [2250]; // Default to US
+    const parsedLocations = locations || [2840]; // Default to US
     
     const keywordMetrics = await keywordPlannerService.getKeywordMetrics(
       keywords,
@@ -94,7 +94,7 @@ export const getHistoricalMetrics = async (req, res) => {
     }
 
     // Parse locations if provided
-    const parsedLocations = locations || [2250]; // Default to US
+    const parsedLocations = locations || [2840]; // Default to US
     
     const historicalMetrics = await keywordPlannerService.getHistoricalMetrics(
       keywords,

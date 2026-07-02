@@ -33,3 +33,5 @@ Thumbs.db
 # Google Ads API credentials
 google-ads.yaml
 client_secret.json
+.vercel
+.env*.local
