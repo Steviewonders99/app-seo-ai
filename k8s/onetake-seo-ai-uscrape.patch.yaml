@@ -1,0 +1,86 @@
+# Strategic merge patch for the existing onetake-seo-ai Deployment.
+# Inspect the live Deployment's namespace, container name, resources, and
+# secret conventions before applying. This does not create a new ingress.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onetake-seo-ai
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: uscrape-seed-data
+          image: novacert.azurecr.io/uscrape-bridge@sha256:b8c30fdbd22362189fb21c3bdce0a098e0cc720124ab4c9817e5ebc2ec04b3fc
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              if [ ! -e /data/.initialized ]; then
+                mkdir -p /data/runs /data/knowledge
+                cp -a /app/runs/. /data/runs/
+                cp -a /app/knowledge/. /data/knowledge/
+                touch /data/.initialized
+              fi
+          volumeMounts:
+            - name: uscrape-data
+              mountPath: /data
+      containers:
+        # Confirm this existing container name before applying. Strategic merge
+        # adds the env entry to it; a wrong name would create another container.
+        - name: onetake-seo-ai
+          env:
+            - name: USCRAPE_BRIDGE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: onetake-uscrape
+                  key: USCRAPE_BRIDGE_TOKEN
+        - name: uscrape-bridge
+          image: novacert.azurecr.io/uscrape-bridge@sha256:b8c30fdbd22362189fb21c3bdce0a098e0cc720124ab4c9817e5ebc2ec04b3fc
+          imagePullPolicy: IfNotPresent
+          command: ["uscrape", "serve", "--host", "127.0.0.1", "--port", "8791"]
+          env:
+            - name: USCRAPE_BRIDGE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: onetake-uscrape
+                  key: USCRAPE_BRIDGE_TOKEN
+            # The OneTake page uses these three extensions. Exclude gateway_ext:
+            # its startup hook creates DB tables, outside this recovery scope.
+            - name: USCRAPE_EXTENSIONS
+              value: /app/extensions/feasibility_ext.py:/app/extensions/brand_xlsx_ext.py:/app/extensions/audience_ext.py
+            - name: OPENROUTER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: onetake-uscrape
+                  key: OPENROUTER_API_KEY
+            - name: FEAS_DB_PROXY_URL
+              value: https://onetake-proxy.oneforma.com
+            - name: FEAS_DB_PROXY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: onetake-uscrape
+                  key: FEAS_DB_PROXY_SECRET
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: onetake-uscrape
+                  key: DATABASE_URL
+            - name: USCRAPE_RUNS_DIR
+              value: /data/runs
+            - name: FEAS_RUNS_DIR
+              value: /data/runs/feasibility
+            - name: USCRAPE_GRAPH_PATH
+              value: /data/knowledge/graph.db
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          volumeMounts:
+            - name: uscrape-data
+              mountPath: /data
+      volumes:
+        - name: uscrape-data
+          emptyDir: {}
