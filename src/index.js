@@ -8,6 +8,7 @@ import swaggerUi from 'swagger-ui-express';
 import keywordRoutes from './routes/keywordRoutes.js';
 import serpRoutes from './routes/serpRoutes.js';
 import competitorRoutes from './routes/competitorRoutes.js';
+import { createUscrapeBridge } from './routes/uscrapeBridge.js';
 import { bearerAuth } from './middleware/auth.js';
 
 // Load environment variables
@@ -19,6 +20,9 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
+// Raw body forwarding must run before Express parses JSON, and the bridge has
+// its own dedicated bearer rather than the SEO AI API key.
+app.use('/uscrape', createUscrapeBridge());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

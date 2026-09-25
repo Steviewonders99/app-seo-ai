@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
+    "test": "node --test test/*.test.js",
     "dev": "nodemon src/index.js",
     "mcp": "node src/mcp.js --mcp",
     "get-token": "node scripts/get_refresh_token.js"
